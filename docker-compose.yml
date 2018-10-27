@@ -1,15 +1,16 @@
+# stack updated: 27.10.2018
 version: '2'
 
 services:
   postgres:
-    image: postgres
+    image: postgres:10
     container_name: asciinema_postgres
     restart: unless-stopped
     volumes:
       - postgres:/var/lib/postgresql/data
 
   redis:
-    image: redis
+    image: redis:5
     container_name: asciinema_redis
     restart: unless-stopped
     volumes:
@@ -22,12 +23,11 @@ services:
     env_file: .env.production
 
   nginx:
-    image: nginx:alpine
+    image: nginx:1.13-alpine
     container_name: asciinema_nginx
     restart: unless-stopped
     links:
       - phoenix
-      - rails
     ports:
       - "127.0.0.1:3000:80"
     volumes:
@@ -35,7 +35,7 @@ services:
       - cache:/cache
 
   phoenix:
-    image: asciinema/asciinema-server:develop
+    image: asciinema/asciinema-server@sha256:fd6343e99215738d4eefb13e331dcbd0947c908b67b3909c7184f04fffdfed80
     command: mix phx.server
     container_name: asciinema_phoenix
     restart: unless-stopped
@@ -46,29 +46,9 @@ services:
     env_file: .env.production
     volumes:
       - uploads:/app/uploads
-      - web:/tmp
-
-  rails:
-    image: asciinema/asciinema-server:develop
-    command: bundle exec unicorn -c config/unicorn.rb
-    container_name: asciinema_rails
-    restart: unless-stopped
-    links:
-      - redis
-      - postgres
-    env_file: .env.production
-    volumes:
-      - uploads:/app/uploads
-      - log:/app/log
-      - web:/tmp
-      - tmp:/app/tmp
 
 volumes:
-  log: {}
   uploads: {}
   cache: {}
   postgres: {}
   redis: {}
-  tmp: {}
-  web: {}
-

@@ -5,8 +5,11 @@ setup:
 	@docker-compose up -d postgres
 	@docker-compose run --rm phoenix setup
 
-deploy:
+start:
 	@docker-compose up -d
+
+stop:
+	@docker-compose down
 
 logs:
 	@docker-compose logs -t
